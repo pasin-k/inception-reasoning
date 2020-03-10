@@ -86,7 +86,7 @@ class InceptionV3():
         # print(label_batch)
         # print(self.model(image_batch).shape)
 
-
-my_model = InceptionV3()
-# my_model.model.summary()
-print(my_model.label_name)
+if __name__ == '__main"__':
+    my_model = InceptionV3()
+    # my_model.model.summary()
+    print(my_model.label_name)
