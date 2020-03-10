@@ -22,6 +22,7 @@ def get_imagenet_to_label():
     return imagenet_code_to_label
 
 
+#Referencing lime: https://github.com/marcotcr/lime
 if __name__ == '__main__':
     model = inc_net.InceptionV3()
     model.summary()
@@ -47,8 +48,10 @@ if __name__ == '__main__':
     decoder = get_imagenet_to_label()
     print(explanation.top_labels[x], decoder[explanation.top_labels[x]])
 
-    temp, mask = explanation.get_image_and_mask(explanation.top_labels[x], positive_only=False, num_features=10,
+    temp, mask = explanation.get_image_and_mask(explanation.top_labels[x], positive_only=False, num_features=3,
                                                 hide_rest=False)
+    print(temp)
+    print(mask)
     print("Explanation time", time.time() - start)
     plt.imshow(mark_boundaries(temp / 2 + 0.5, mask))
     plt.show()
