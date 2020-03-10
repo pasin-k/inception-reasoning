@@ -4,6 +4,7 @@ import json
 from sklearn.utils import shuffle
 import pickle
 import matplotlib.pyplot as plt
+import pathlib
 
 def get_data_coco():  # Unused
     # Reference: https://www.tensorflow.org/tutorials/text/image_captioning?hl=zh-tw
@@ -61,20 +62,26 @@ def get_data_coco():  # Unused
 
 def download_cifar100():
     def save_data_and_label(folder_name):
+        # Read data from binary
         with open(os.path.join(data_dir, folder_name), 'rb') as f:
             f.seek(0)
             dict = pickle.load(f, encoding='latin1')
         folder_name = folder_name + '_data'
         if not os.path.isdir(os.path.join(data_dir, folder_name)):
             os.makedirs(os.path.join(data_dir, folder_name))
+
+        # Save as png image
         for i, name in enumerate(dict['filenames']):
-            data = dict['data'][i, :].reshape((3 ,32 ,32))
-            data = data.transpose(1 ,2 ,0).astype('uint8')
+            data = dict['data'][i, :].reshape((3, 32, 32))
+            data = data.transpose(1, 2, 0).astype('uint8')
             plt.imsave(os.path.join(data_dir, folder_name, name), data, vmin=0, vmax=255)
-        with open(os.path.join(data_dir, folder_name, 'label.json'), 'w') as filehandle:
-            json.dump({'filenames': dict['filenames'], 'label' :dict['fine_labels']}, filehandle)
+
+        # Save label
+        with open(os.path.join(data_dir, folder_name + '_label.json'), 'w') as filehandle:
+            json.dump({'filenames': dict['filenames'], 'label': dict['fine_labels']}, filehandle)
 
     image_folder = '/cifar-100-python/'
+    # Load dataset if not found one
     if not os.path.exists(os.path.abspath('.') + image_folder):
         image_zip = tf.keras.utils.get_file('train2014.zip',
                                             cache_subdir=os.path.abspath('.'),
@@ -90,3 +97,39 @@ def download_cifar100():
         print("Use existing data")
         data_dir = os.path.abspath('.') + image_folder
     return data_dir
+
+
+def load_to_tfrecords(data_path):
+    data_dir = pathlib.Path(os.path.join(data_path, 'train_data'))
+    train_ds = tf.data.Dataset.list_files(str(data_dir/'*'))
+    for f in train_ds.take(100):
+        print(f.numpy())
+    # train_ds = tf.data.Dataset.list_files(os.path.join(data_path, 'train_data', '.png*'))
+    label_path = os.path.join(data_path, 'train_data_label.json')
+    train_ds = train_ds.map(lambda x: process_path(x, label_path))
+    for image, label in train_ds.take(2):
+        print("Image shape: ", image.numpy().shape)
+        print("Label: ", label.numpy())
+
+    test_ds = tf.data.Dataset.list_files(os.path.join(data_path, 'test_data', '*.png*'))
+
+
+def get_label(file_path):
+    with open(file_path) as filehandle:
+        labels = json.load(filehandle)
+    return tf.convert_to_tensor(labels['label'],dtype=tf.int32)
+
+
+def decode_img(img, width, height):
+    img = tf.image.decode_png(img, channels=3)
+    img = tf.image.convert_image_dtype(img, tf.float32)
+    return tf.image.resize(img, [width, height])
+
+
+def process_path(data_path, label_path):
+    label = get_label(label_path)
+    # load the raw data from the file as a string
+    img = tf.io.read_file(data_path)
+    img = decode_img(img, width=299, height=299)
+    print(label)
+    return img, label

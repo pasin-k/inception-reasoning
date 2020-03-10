@@ -19,6 +19,7 @@ class InceptionV3():
         self.learning_rate = 0.0001
         self.model = None
 
+        # Load Model
         if self.model_dir is None:
             self.model = self._get_pretrained_model()
             self.model_dir = './model/inceptionv3_model'
@@ -29,13 +30,19 @@ class InceptionV3():
                 raise NameError("Model not found")
         self.model.summary()
 
+        # Select dataset folder
         if self.data_dir is None:
+            # Load cifar100 dataset
             self.data_dir = data.download_cifar100()
 
+        # Load label name from meta file
         with open(os.path.join(self.data_dir, 'meta'), 'rb') as f:
             f.seek(0)
             meta = pickle.load(f, encoding='latin1')
             self.label_name = meta['fine_label_names']  # ['fine_label_names', 'coarse_label_names']
+
+        # Load data
+        data.load_to_tfrecords(self.data_dir)
 
 
 
@@ -47,6 +54,7 @@ class InceptionV3():
         out_layer = tf.keras.layers.Dense(100)
         model = tf.keras.Sequential([base_model, pool_layer, out_layer])
         return model
+
 
     def train(self):
         self.model.compile(optimizer=tf.keras.optimizers.RMSprop(lr=self.learning_rate),
