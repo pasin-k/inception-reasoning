@@ -56,9 +56,10 @@ class InceptionV3():
         return model
 
 
-    def train(self):
+    def train(self, dataset):
         self.model.compile(optimizer=tf.keras.optimizers.RMSprop(lr=self.learning_rate),
                            loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+
 
 
 
