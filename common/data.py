@@ -1,7 +1,7 @@
 import os
 import random
 import tensorflow as tf
-from tensorflow.keras.applications.inception_v3 import preprocess_input
+from tensorflow.keras.applications.inception_v3 import preprocess_input as prepro_inp
 import json
 from sklearn.utils import shuffle
 import pickle
@@ -98,6 +98,7 @@ def download_cifar100():
     Download cifar100 dataset, convert data into tfrecords for pipeline process during data fetching
     @return: Create directory "./data/cifar-100-python" containing tfrecords and original images
     """
+
     def _save_data_and_label(save_dir):
         # Read data from binary
         with open(save_dir, 'rb') as f:
@@ -141,28 +142,28 @@ def download_cifar100():
         print("Decoding images and save to .tfrecords")
         _save_data_and_label(os.path.join(image_folder, 'train'))
         _save_data_and_label(os.path.join(image_folder, 'test'))
-        os.remove(os.path.join(image_folder,'train'))
-        os.remove(os.path.join(image_folder,'test'))
-        os.remove(os.path.join(image_folder,'meta'))
+        os.remove(os.path.join(image_folder, 'train'))
+        os.remove(os.path.join(image_folder, 'test'))
+        os.remove(os.path.join(image_folder, 'meta'))
     else:
         print("Use existed data instead")
     return image_folder
 
 
-class Data():
-    def __init__(self, data_folder_path=None, seed=None, data_size=(299, 299), batch_size=8):
+class Dataset():
+    def __init__(self, data_folder_path=None, seed=None, image_size=(299, 299), batch_size=8):
         if data_folder_path is None:
             self.data_folder_path = './data/cifar-100-python/'
         else:
             self.data_folder_path = data_folder_path
         random.seed(seed)
-        self.data_size = data_size
+        self.image_size = image_size
         self.data_index = None
         self.train_data = None
         self.test_data = None
         self.BATCH_SIZE = batch_size
 
-    def get_image(self, image_dir, num_data):
+    def get_images(self, image_dir, num_data):
         """
         Get image from given directory
         @param image_dir: string of folder directory where images are stored. All file in folder must only be images
@@ -183,14 +184,14 @@ class Data():
         # Load images
         image_data = []
         for img_path in image_file_names:
-            img = tf.keras.preprocessing.image.load_img(img_path, target_size=self.data_size)
+            img = tf.keras.preprocessing.image.load_img(img_path, target_size=self.image_size)
             x = tf.keras.preprocessing.image.img_to_array(img)
             x = np.expand_dims(x, axis=0)
-            x = preprocess_input(x)
+            x = prepro_inp(x)
             image_data.append(x)
         return np.vstack(image_data)
 
-    def get_label(self, label_path, num_data):
+    def get_labels(self, label_path, num_data):
         """
         Get label data from a json file. Json file should have a dictionary 'filenames' and 'label' with list of
         all label in it. In this case, we sort the label by index of filenames
@@ -228,16 +229,16 @@ class Data():
 
         def _decode(data_dict):
             img = tf.image.decode_png(data_dict['image_raw'], channels=3)
-            img = tf.image.resize(img, self.data_size)
-            img = preprocess_input(img)
+            img = tf.image.resize(img, self.image_size)
+            img = prepro_inp(img)
             label = data_dict['label']
             return img, label
 
-        raw_train_dataset = tf.data.TFRecordDataset(os.path.join(self.data_folder_path,"train.tfrecords"))
+        raw_train_dataset = tf.data.TFRecordDataset(os.path.join(self.data_folder_path, "train.tfrecords"))
         train_dataset = raw_train_dataset.map(_deserialize)
         train_dataset = train_dataset.map(_decode)
         train_dataset = train_dataset.shuffle(500).batch(self.BATCH_SIZE)
-        train_dataset = train_dataset.repeat(None)
+        # train_dataset = train_dataset.repeat(None)
         self.train_data = train_dataset.prefetch(buffer_size=None)
 
         raw_test_dataset = tf.data.TFRecordDataset(os.path.join(self.data_folder_path, "test.tfrecords"))
@@ -245,6 +246,10 @@ class Data():
         test_dataset = test_dataset.map(_decode)
         self.test_data = test_dataset.batch(self.BATCH_SIZE)
         return self.train_data, self.test_data
+
+    def _load_image_and_label(self, image_dir, label_dir, num_data):
+        return {"image": self.get_images(image_dir, num_data),
+                "label": self.get_labels(label_dir, num_data)}
 
     def load_data_numpy(self, train_num_data=None, test_num_data=None, data_type=None):
         """
@@ -257,27 +262,27 @@ class Data():
 
         train_image_dir = os.path.join(self.data_folder_path, 'train_data')
         train_label_dir = os.path.join(self.data_folder_path, 'train_data_label.json')
-        train_data = {"image": self.get_image(train_image_dir, train_num_data),
-                           "label": self.get_label(train_label_dir, train_num_data)}
+        train_data = self._load_image_and_label(train_image_dir, train_label_dir, train_num_data)
 
         self.data_index = None
         test_image_dir = os.path.join(self.data_folder_path, 'test_data')
         test_label_dir = os.path.join(self.data_folder_path, 'test_data_label.json')
-        test_data = {"image": self.get_image(test_image_dir, test_num_data),
-                           "label": self.get_label(test_label_dir, test_num_data)}
+        test_data = self._load_image_and_label(test_image_dir, test_label_dir, test_num_data)
 
         if data_type is None:
             self.train_data = train_data
             self.test_data = test_data
-        elif data_type.lower() == 'tf':
+        elif data_type.lower() == 'tf':  # Convert to tf.Dataset
             self.train_data = tf.data.Dataset.from_tensor_slices((train_data['image'], train_data['label']))
             self.test_data = tf.data.Dataset.from_tensor_slices((test_data['image'], test_data['label']))
         else:
             raise KeyError("Daty type invalid")
         return self.train_data, self.test_data
 
+    def preprocess_input(self, inp):
+        return prepro_inp(inp)
 
 if __name__ == '__main__':
-    our_data = Data()
+    our_data = Dataset()
     train_data, test_data = our_data.load_data_numpy(train_num_data=100, test_num_data=100)
     # print(y_train)

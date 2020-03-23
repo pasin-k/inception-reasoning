@@ -1,18 +1,17 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
+from tensorflow.keras.applications.inception_v3 import decode_predictions
 import os
 import pickle
 from common import data
 from sklearn.model_selection import train_test_split
 
-
 tfds.disable_progress_bar()
 
 
 class InceptionV3():
-    def __init__(self, model_dir=None, data_dir=None):
+    def __init__(self, model_dir=None):
         self.model_dir = model_dir
-        self.data_dir = data_dir
         self.IMG_SIZE = 299
         self.BATCH_SIZE = 32
         self.SHUFFLE_BUFFER_SIZE = 1000
@@ -28,43 +27,29 @@ class InceptionV3():
                 self.model = tf.keras.models.load_model(model_dir)
             except:
                 raise NameError("Model not found")
-        self.model.summary()
-
-        # Select dataset folder
-        if self.data_dir is None:
-            # Load cifar100 dataset
-            self.data_dir = data.download_cifar100()
-
-        # Load label name from meta file
-        with open(os.path.join(self.data_dir, 'meta'), 'rb') as f:
-            f.seek(0)
-            meta = pickle.load(f, encoding='latin1')
-            self.label_name = meta['fine_label_names']  # ['fine_label_names', 'coarse_label_names']
-
-        # Load data
-        data.load_to_tfrecords(self.data_dir)
-
-
 
     @staticmethod
     def _get_pretrained_model():
-        base_model = tf.keras.applications.InceptionV3(include_top=False, weights='imagenet')
-        base_model.trainable = False
-        pool_layer = tf.keras.layers.GlobalAveragePooling2D()
-        out_layer = tf.keras.layers.Dense(100)
-        model = tf.keras.Sequential([base_model, pool_layer, out_layer])
-        return model
+        base_model = tf.keras.applications.InceptionV3(include_top=True, weights='imagenet')
+        # base_model.trainable = False
+        # pool_layer = tf.keras.layers.GlobalAveragePooling2D()
+        # out_layer = tf.keras.layers.Dense(100)
+        # model = tf.keras.Sequential([base_model, pool_layer, out_layer])
+        # return model
+        return base_model
 
-
-    def train(self, dataset):
+    def train(self, dataset, epochs):
+        """
+        Train model
+        @param dataset: data.Data object
+        @return:
+        """
         self.model.compile(optimizer=tf.keras.optimizers.RMSprop(lr=self.learning_rate),
                            loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
-
-
-
-
-
-
+        self.model.fit(dataset.train_data, epochs=epochs)
+        loss, accuracy = self.model.evaluate(dataset.train_data)
+        print("Loss :", loss)
+        print("Accuracy :", accuracy)
 
         # image_folder = '/train2014/'
         # if not os.path.exists(os.path.abspath('.') + image_folder):
@@ -95,7 +80,18 @@ class InceptionV3():
         # print(label_batch)
         # print(self.model(image_batch).shape)
 
-if __name__ == '__main"__':
+    def predict(self, image):
+        return self.model.predict(image)
+
+    def decode_predict(self, prediction):
+        return decode_predictions(prediction)
+
+
+if __name__ == '__main__':
     my_model = InceptionV3()
-    # my_model.model.summary()
-    print(my_model.label_name)
+    print(my_model.model.summary())
+    data = data.Dataset()
+
+    data.load_data_tfrecord()
+    print(data.train_data)
+    my_model.train(data, epochs=2)
