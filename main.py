@@ -3,7 +3,7 @@ from common.data import Dataset
 import os, sys
 import linecache
 import urllib.request
-import numpy as np
+
 from lime import lime_image
 from tensorflow.keras.applications import inception_v3 as inc_net
 

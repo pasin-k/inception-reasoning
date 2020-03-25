@@ -1,12 +1,72 @@
 <!DOCTYPE html>
-<html>
-<body>
+<!-- html template by https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_blog&stacked=h -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
 
-<form action="upload.php" enctype="multipart/form-data" method="post">
-    Select image to upload:
-    <input id="fileToUpload" name="fileToUpload" type="file">
-    <input name="submit" type="submit" value="Upload Image">
-</form>
+    <title>InceptionV3 Explanator</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Visualization of the reasonings on InceptionV3 Model">
+    <meta name="author" content="PasinK">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <style>
+        body, h1, h2, h3, h4, h5 {
+            font-family: "Raleway", sans-serif
+        }
+    </style>
+</head>
 
+<body class="w3-light-grey">
+<div class="w3-content" style="max-width:1400px">
+    <!-- Header -->
+    <header class="w3-container w3-center w3-padding-32">
+        <h1><b>InceptionV3 Explanator</b></h1>
+        <p>Welcome to the demo for Machine Learning Model Visualization.
+            <br> Can you trust your model? Is the model actually look at the correct part of the input?
+            <br> See how the model decide the output using LIME algorithm
+        </p>
+    </header>
+
+    <!-- Main Body-->
+    <div class="w3-card-4 w3-margin w3-white">
+
+        <img class="centered-and-cropped" src="./src/image_background.jpg" alt="Nature" style="width:100%" width="350"
+             height="150">
+        <div class="w3-container">
+            <h3><b>Upload or Choose Image</b></h3>
+            <h5>Select an image to visualize </h5>
+        </div>
+
+        <div class="w3-container">
+            <form action="upload.php" enctype="multipart/form-data" method="post">
+                <label for="fileToUpload">Select Image:</label>
+                <input id="fileToUpload" name="fileToUpload" type="file"><br><br>
+                <input name="submit" type="submit" value="Upload Image">
+            </form>
+
+            <div class="w3-row">
+                <div class="w3-col m8 s12">
+                    <p>
+                        <button class="w3-button w3-padding-large w3-white w3-border"><b>READ MORE »</b></button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--    <div>-->
+    <!--        <p><input type="file"  accept="image/*" name="image" id="file"  onchange="loadFile(event)" style="display: none;"></p>-->
+    <!--        <p><label for="file" style="cursor: pointer;">Upload Image</label></p>-->
+    <!--        <p><img id="output" width="500" /></p>-->
+
+    <!--        <script>-->
+    <!--        var loadFile = function(event) {-->
+    <!--            var image = document.getElementById('output');-->
+    <!--            image.src = URL.createObjectURL(event.target.files[0]);-->
+    <!--        };-->
+    <!--        </script>-->
+    <!--    </div>-->
+</div>
 </body>
 </html>
