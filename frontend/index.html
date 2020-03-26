@@ -11,6 +11,24 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <style>
+        .image-preview {
+            width: 300px;
+            min-height: 100px;
+            border: 2px solid #dddddd;
+            margin-top: 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #cccccc;
+        }
+
+        .image-preview__image {
+            display: none;
+            width: 100%;
+        }
+
         body, h1, h2, h3, h4, h5 {
             font-family: "Raleway", sans-serif
         }
@@ -40,10 +58,93 @@
         </div>
 
         <div class="w3-container">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+            <!--            <form action="#" enctype="multipart/form-data" method="post">-->
             <form action="upload.php" enctype="multipart/form-data" method="post">
                 <label for="fileToUpload">Select Image:</label>
-                <input id="fileToUpload" name="fileToUpload" type="file"><br><br>
-                <input name="submit" type="submit" value="Upload Image">
+                <input type="hidden" id="MAX_FILE_SIZE" value="8388608" name="MAX_FILE_SIZE">
+                <input type="file" name="fileToUpload" id="fileToUpload">
+
+                <div class="image-preview" id="imagePreview">
+                    <img src="" alt="Image Preview" class="image-preview__image">
+                    <span class="image-preview_default-text">Image Preview</span>
+                </div>
+                <br>
+                <input name="submit" type="submit" id="submit" value="Upload Image">
+
+                <!-- Code for preview image-->
+                <script>
+                    const inpFile = document.getElementById("fileToUpload");
+                    const previewContainer = document.getElementById("imagePreview");
+                    const previewImage = previewContainer.querySelector(".image-preview__image");
+                    const previewDefaultText = previewContainer.querySelector(".image-preview_default-text");
+
+                    inpFile.addEventListener("change", function () {
+                        const file = this.files[0];
+                        if (file) {
+                            const reader = new FileReader(); // Read file from filesystem
+                            previewDefaultText.style.display = "none";
+                            previewImage.style.display = "block";
+                            reader.addEventListener("load", function () {
+                                previewImage.setAttribute("src", this.result);  // result is value from FileReader()
+                            });
+
+                            reader.readAsDataURL(file);
+                        } else {  // If there is no file uploaded
+                            previewDefaultText.style.display = null;  // Use default value
+                            previewImage.style.display = null;
+                            previewImage.setAttribute("src", "");
+                        }
+
+                        function getExtension(filename) {
+                            var parts = filename.split('.');
+                            return parts[parts.length - 1];
+                        }
+
+                        function isImage(filename) {
+                            var ext = getExtension(filename);
+                            switch (ext.toLowerCase()) {
+                                case 'jpg':
+                                case 'jpeg':
+                                case 'gif':
+                                case 'bmp':
+                                case 'png':
+                                    //etc
+                                    return true;
+                            }
+                            return false;
+                        }
+
+                        $(function () {
+                            $('form').submit(function () {
+                                function failValidation(msg) {
+                                    alert(msg); // just an alert for now but you can spice this up later
+                                    return false;
+                                }
+
+                                var file = $('#fileToUpload');
+                                if (!isImage(file.val())) {
+                                    return failValidation('Please select a valid image');
+                                }
+
+                                // success at this point
+                                // indicate success with alert for now
+                                console.log(this.file);
+                                alert("test");
+                                $.ajax({
+                                    type: "POST",
+                                    url: "upload.php",
+                                    data: ({filename: this.file})
+                                });
+                                return true;
+                            });
+
+                        });
+                    });
+
+
+                </script>
+
             </form>
 
             <div class="w3-row">

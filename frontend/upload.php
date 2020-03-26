@@ -1,7 +1,14 @@
 <?php
+if (!empty($_POST))
+{
+    // handle post data
+    $fromPerson = '+from%3A'.$_POST['filename'];
+    echo $fromPerson;
+} else {
+echo "No data";}
 
-
-
+$name = $_POST['filename'];
+echo "$name";
 $target_dir = "/home/pasin/Documents/inception-reasoning/frontend/uploads/";
 $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
 $uploadOk = 1;
@@ -39,6 +46,7 @@ if ($_FILES["fileToUpload"]['size'] == 0) {
     if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
     && $imageFileType != "gif" ) {
         echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+//         echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         $uploadOk = 0;
     }
 }
