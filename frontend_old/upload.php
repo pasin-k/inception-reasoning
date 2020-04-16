@@ -1,15 +1,5 @@
 <?php
-if (!empty($_POST))
-{
-    // handle post data
-    $fromPerson = '+from%3A'.$_POST['filename'];
-    echo $fromPerson;
-} else {
-echo "No data";}
-
-$name = $_POST['filename'];
-echo "$name";
-$target_dir = "/home/pasin/Documents/inception-reasoning/frontend/uploads/";
+$target_dir = "uploads/";
 $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
 $uploadOk = 1;
 $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
@@ -21,7 +11,7 @@ if(isset($_POST["submit"])) {
     } else {
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
         if($check !== false) {
-            echo "File is an image - " . $check["mime"] . ".";
+            //echo "File is an image - " . $check["mime"] . ".";
             $uploadOk = 1;
         } else {
             echo "File is not an image.";
@@ -56,7 +46,14 @@ if ($uploadOk == 0) {
 // if everything is ok, try to upload file
 } else {
     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-        echo "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
+        echo "Target file: $target_file";
+        $command = "python ../test.py -i $target_file";
+        echo shell_exec($command);
+        $output = '';
+        //echo exec($command, $output);
+
+        //var_dump($output);
+        //var_dump($ret_val);
     } else {
         echo "Sorry, there was an error uploading your file.";
     }

@@ -2,6 +2,6 @@
 *.iml
 *__pycache__*
 data/*
-/frontend/uploads/*
-!frontend/uploads/.gitkeep
-/frontend/src/
+/frontend_old/uploads/*
+!frontend_old/uploads/.gitkeep
+/frontend_old/src/

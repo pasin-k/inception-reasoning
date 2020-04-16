@@ -95,8 +95,8 @@
                             previewImage.style.display = null;
                             previewImage.setAttribute("src", "");
                         }
-
-                        function getExtension(filename) {
+                    });
+                    function getExtension(filename) {
                             var parts = filename.split('.');
                             return parts[parts.length - 1];
                         }
@@ -130,17 +130,16 @@
                                 // success at this point
                                 // indicate success with alert for now
                                 console.log(this.file);
-                                alert("test");
+
                                 $.ajax({
                                     type: "POST",
                                     url: "upload.php",
-                                    data: ({filename: this.file})
+                                    data: ({filename: "abc"})
                                 });
                                 return true;
                             });
 
                         });
-                    });
 
 
                 </script>
