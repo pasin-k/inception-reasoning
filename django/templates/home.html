@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="w3-content" style="max-width:1400px">
+
+    <!-- Header -->
+    <header class="w3-container w3-center w3-padding-32">
+        <h1><b>InceptionV3 Explanator</b></h1>
+        <p>Welcome to the demo for Machine Learning Model Visualization.
+            <br> Can you trust your model? Is the model actually look at the correct part of the input?
+            <br> See how the model decide the output using LIME algorithm
+        </p>
+    </header>
+
+    <!-- Main Body-->
+    <div class="w3-card-4 w3-margin w3-white">
+
+        <img alt="Nature" class="centered-and-cropped"
+             height="150" src="https://cdn.pixabay.com/photo/2018/09/27/09/22/web-3706562__340.jpg" style="width:100%"
+             width="350">
+        <div class="w3-container">
+            <h3><b>Upload or Choose Image</b></h3>
+            <h5>Select an image to visualize </h5>
+        </div>
+
+        <div class="w3-container">
+<!--            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+            <!--            <form action="#" enctype="multipart/form-data" method="post">-->
+            <form action="upload.php" enctype="multipart/form-data" method="post">
+                <label for="fileToUpload">Select Image:</label>
+                <input id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" type="hidden" value="8388608">
+                <input id="fileToUpload" name="fileToUpload" type="file">
+
+                <div class="image-preview" id="imagePreview">
+                    <img alt="Image Preview" class="image-preview__image" src="">
+                    <span class="image-preview_default-text">Image Preview</span>
+                </div>
+                <br>
+                <input id="submit" name="submit" type="submit" value="Upload Image">
+
+<!--                &lt;!&ndash; Code for preview image&ndash;&gt;-->
+<!--                <script>-->
+<!--                    const inpFile = document.getElementById("fileToUpload");-->
+<!--                    const previewContainer = document.getElementById("imagePreview");-->
+<!--                    const previewImage = previewContainer.querySelector(".image-preview__image");-->
+<!--                    const previewDefaultText = previewContainer.querySelector(".image-preview_default-text");-->
+
+<!--                    inpFile.addEventListener("change", function () {-->
+<!--                        const file = this.files[0];-->
+<!--                        if (file) {-->
+<!--                            const reader = new FileReader(); // Read file from filesystem-->
+<!--                            previewDefaultText.style.display = "none";-->
+<!--                            previewImage.style.display = "block";-->
+<!--                            reader.addEventListener("load", function () {-->
+<!--                                previewImage.setAttribute("src", this.result);  // result is value from FileReader()-->
+<!--                            });-->
+
+<!--                            reader.readAsDataURL(file);-->
+<!--                        } else {  // If there is no file uploaded-->
+<!--                            previewDefaultText.style.display = null;  // Use default value-->
+<!--                            previewImage.style.display = null;-->
+<!--                            previewImage.setAttribute("src", "");-->
+<!--                        }-->
+<!--                    });-->
+<!--                    function getExtension(filename) {-->
+<!--                            var parts = filename.split('.');-->
+<!--                            return parts[parts.length - 1];-->
+<!--                        }-->
+
+<!--                        function isImage(filename) {-->
+<!--                            var ext = getExtension(filename);-->
+<!--                            switch (ext.toLowerCase()) {-->
+<!--                                case 'jpg':-->
+<!--                                case 'jpeg':-->
+<!--                                case 'gif':-->
+<!--                                case 'bmp':-->
+<!--                                case 'png':-->
+<!--                                    //etc-->
+<!--                                    return true;-->
+<!--                            }-->
+<!--                            return false;-->
+<!--                        }-->
+
+<!--                        $(function () {-->
+<!--                            $('form').submit(function () {-->
+<!--                                function failValidation(msg) {-->
+<!--                                    alert(msg); // just an alert for now but you can spice this up later-->
+<!--                                    return false;-->
+<!--                                }-->
+
+<!--                                var file = $('#fileToUpload');-->
+<!--                                if (!isImage(file.val())) {-->
+<!--                                    return failValidation('Please select a valid image');-->
+<!--                                }-->
+
+<!--                                // success at this point-->
+<!--                                // indicate success with alert for now-->
+<!--                                console.log(this.file);-->
+
+<!--                                $.ajax({-->
+<!--                                    type: "POST",-->
+<!--                                    url: "upload.php",-->
+<!--                                    data: ({filename: "abc"})-->
+<!--                                });-->
+<!--                                return true;-->
+<!--                            });-->
+
+<!--                        });-->
+
+
+<!--                </script>-->
+
+            </form>
+
+            <div class="w3-row">
+                <div class="w3-col m8 s12">
+                    <p>
+                        <button class="w3-button w3-padding-large w3-white w3-border"><b>READ MORE »</b></button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--    <div>-->
+    <!--        <p><input type="file"  accept="image/*" name="image" id="file"  onchange="loadFile(event)" style="display: none;"></p>-->
+    <!--        <p><label for="file" style="cursor: pointer;">Upload Image</label></p>-->
+    <!--        <p><img id="output" width="500" /></p>-->
+
+    <!--        <script>-->
+    <!--        var loadFile = function(event) {-->
+    <!--            var image = document.getElementById('output');-->
+    <!--            image.src = URL.createObjectURL(event.target.files[0]);-->
+    <!--        };-->
+    <!--        </script>-->
+    <!--    </div>-->
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- html template by https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_blog&stacked=h -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>InceptionV3 Explanator</title>
+    <meta charset="UTF-8">
+    <meta content="Visualization of the reasonings on InceptionV3 Model" name="description">
+    <meta content="PasinK" name="author">
+    <link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <style>
+        .image-preview {
+            width: 300px;
+            min-height: 100px;
+            border: 2px solid #dddddd;
+            margin-top: 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #cccccc;
+        }
+
+        .image-preview__image {
+            display: none;
+            width: 100%;
+        }
+
+        body, h1, h2, h3, h4, h5 {
+            font-family: "Raleway", sans-serif
+        }
+
+    </style>
+</head>
+
+<body class="w3-light-grey">
+    {% block content %}
+
+    {% endblock %}
+
+</body>
+</html>
