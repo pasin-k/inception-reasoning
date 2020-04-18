@@ -4,5 +4,5 @@ from .views import HomePageView, uploads
 
 urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
-    path('uploads/', uploads, name='uploading')
+    path('upload-form/', uploads, name='uploading'),
 ]

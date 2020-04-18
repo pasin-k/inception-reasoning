@@ -21,7 +21,7 @@
         </div>
 
         <div class="w3-container">
-            <form action="upload-form/" enctype="multipart/form-data" method="post" >
+            <form action="/upload-form/" enctype="multipart/form-data" method="post" >
                 {% csrf_token %}
                 {{ userform.as_p}}
                 <button type="submit">Test your image</button>

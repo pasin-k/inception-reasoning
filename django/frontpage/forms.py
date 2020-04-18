@@ -10,6 +10,7 @@ class UploadForm(forms.Form):
         user_file = cleaned_data.get("user_file")
 
         if user_file:
+            print("Debug", user_file)
             if user_file.size > 5*1024*1024:
                 raise forms.ValidationError("File is too big")
             if not Path(user_file).suffix.strip().lower() in ['.jpg','.png','.gif','.jpeg']:
