@@ -3,5 +3,5 @@
 *__pycache__*
 data/*
 /frontend_old/*
-django/frontpage/media/*
-django/frontpage/static
+django/media
+django/static
