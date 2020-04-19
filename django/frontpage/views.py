@@ -4,6 +4,7 @@ from django.urls import reverse_lazy # new
 from django.conf import settings
 
 from pathlib import Path
+import os
 from PIL import Image as PILImg
 from PIL import ImageEnhance as PILImageEnhance
 from .forms import UploadForm # new
@@ -14,16 +15,18 @@ class HomePageView(ListView):
     template_name = 'home.html'
 
 
-def uploads(request):
+def upload_file(request):
     template = "uploads.html"
+    folder = "images"
     data = {}
     if request.POST:
         userform = UploadForm(request.POST, request.FILES)
+        print(userform)
         if userform.is_valid():
             origin_form = userform.cleaned_data["user_file"]
-            origin_name = origin_form.name
+            origin_name = Path(folder) / origin_form.name
             original_file = Path(settings.MEDIA_ROOT).joinpath(origin_name)
-            thumb_name = original_file.stem + "_thumb.jpg"
+            thumb_name = Path(folder) / (original_file.stem + "_thumb.jpg")
             thumb_file = Path(settings.MEDIA_ROOT).joinpath(thumb_name)
             if original_file.is_file():
                 original_file.unlink()
@@ -38,6 +41,7 @@ def uploads(request):
             # sharpness image
             image = PILImageEnhance.Sharpness(image)
             image = image.enhance(1.3)
+            print("Debug", thumb_file)
             image.save(thumb_file, 'JPEG')
             data.update(origin_name=origin_name)
             data.update(thumb_name=thumb_name)
