@@ -1,7 +1,7 @@
 *.xml
 *.iml
 *__pycache__*
-data/*
+django/algorithm/data
 /frontend_old/*
 django/media
 django/static
