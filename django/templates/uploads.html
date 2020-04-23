@@ -39,18 +39,20 @@
             <br>
             <br>
 
-            <h2>{{origin_name}} (original)</h2>
+
 
             {% if origin_name  %}
-                <img src="{{MEDIA_URL}}{{origin_name}}">
+                <h2>{{origin_name}} (original) {{title}}</h2>
+                <img src="{{MEDIA_URL}}{{folder_dir}}{{origin_name}}">
             {% endif %}
 
             <br>
             <br>
 
-            <h2>{{ thumb_name }} (150x150)</h2>
+
             {% if thumb_name %}
-                <img src="{{ MEDIA_URL }}{{ thumb_name }}">
+                <h2>{{ thumb_name }} (150x150)</h2>
+                <img src="{{ MEDIA_URL }}{{folder_dir}}{{ thumb_name }}">
             {% endif %}
         </div>
     </div>
