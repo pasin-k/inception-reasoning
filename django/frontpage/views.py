@@ -11,6 +11,7 @@ from .forms import UploadForm
 from .models import Upload
 
 sys.path.append('..')
+import numpy as np
 from algorithm.main import predict
 
 # Create your views here.
@@ -26,7 +27,7 @@ def upload_file(request):
     if request.POST:
         userform = UploadForm(request.POST, request.FILES)
         if userform.is_valid():
-            #TODO: Connect this part with our model
+
             origin_form = userform.cleaned_data["user_file"]
             origin_name = origin_form.name
             original_file = Path(settings.MEDIA_ROOT).joinpath(folder, origin_name)
@@ -42,8 +43,14 @@ def upload_file(request):
             image = image.resize((299, 299), PILImg.ANTIALIAS)
             image.save(original_file, 'PNG')
 
-            prediction_array = predict(original_file)
+            # TODO: predict returns as (0,1) value but we need (0,255) for fromarray function
+            prediction_array = predict(original_file, show_img=False)
+            if prediction_array.dtype == np.float32 or prediction_array.dtype == np.float64:
+                prediction_array = np.uint8(prediction_array * 255)
+            print(prediction_array)
+            print(prediction_array.dtype)
             predict_image = PILImg.fromarray(prediction_array)
+
             predict_image.save(prediction_file, 'PNG')
 
             data.update(title=userform['title'].value)

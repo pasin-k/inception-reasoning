@@ -11,13 +11,20 @@ from skimage.segmentation import mark_boundaries
 from lime import lime_image
 from tensorflow.keras.applications.inception_v3 import preprocess_input as prepro_inp
 from tensorflow.keras.preprocessing import image
-from .model import InceptionV3
-from .common.data import Dataset
+try:
+    from .model import InceptionV3  # Use for django run
+except ImportError:
+    from model import InceptionV3  # Use for terminal run
+# from .common.data import Dataset
 
 def get_imagenet_to_label():
     imagenet_code_to_label = {}
-    with open("./imagenet_to_label.txt") as f:
-        lines = f.readlines()
+    try:
+        with open("./algorithm/imagenet_to_label.txt") as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        with open("imagenet_to_label.txt") as f:
+            lines = f.readlines()
 
     for line in lines:
         temp = line.replace('{', '').replace('}', '').split(':')
@@ -36,34 +43,34 @@ def predict(test_image_path, show_img=True):
     # my_model.train(data, epochs=2)
 
     img = image.load_img(test_image_path, target_size=(299, 299))
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    x = prepro_inp(x)
-    x = np.vstack([x])
+    ranks = image.img_to_array(img)
+    ranks = np.expand_dims(ranks, axis=0)
+    ranks = prepro_inp(ranks)
+    ranks = np.vstack([ranks])
 
-    prediction = my_model.predict(x)
+    prediction = my_model.predict(ranks)
 
     for i in my_model.decode_predict(prediction):
         print(i)
 
     start = time.time()
     explainer = lime_image.LimeImageExplainer(verbose=True)
-    explanation = explainer.explain_instance(x[0], my_model.predict, top_labels=5, hide_color=0, num_samples=100)
+    explanation = explainer.explain_instance(ranks[0], my_model.predict, top_labels=5, hide_color=0, num_samples=1000)
     # print(explanation)
 
-    x = 0
+    ranks = 0
     decoder = get_imagenet_to_label()
-    print(explanation.top_labels[x], decoder[explanation.top_labels[x]])
+    print(explanation.top_labels[ranks], decoder[explanation.top_labels[ranks]])
 
-    temp, mask = explanation.get_image_and_mask(explanation.top_labels[x], positive_only=False, num_features=3,
-                                                hide_rest=False)
+    temp, mask = explanation.get_image_and_mask(explanation.top_labels[ranks], positive_only=False, num_features=5,
+                                                hide_rest=False)  # num_features is top super pixel that gives positive value
 
     print("Explanation time", time.time() - start)
-
     if show_img:
         plt.imshow(mark_boundaries(temp / 2 + 0.5, mask))
         plt.show()
-    return mark_boundaries(temp / 2 + 0.5, mask)
+    masked_image = mark_boundaries(temp / 2 + 0.5, mask)
+    return masked_image
 
 
 # Referencing lime: https://github.com/marcotcr/lime

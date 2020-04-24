@@ -3,7 +3,7 @@ from .models import Upload
 from pathlib import Path
 
 class UploadForm(forms.Form):
-    title = forms.CharField(max_length=50)
+    # title = forms.CharField(max_length=50)
     user_file = forms.FileField()
 
     def clean_user_file(self, *args, **kwargs):

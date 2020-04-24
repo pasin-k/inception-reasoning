@@ -3,7 +3,10 @@ import tensorflow_datasets as tfds
 from tensorflow.keras.applications.inception_v3 import decode_predictions
 import os
 import pickle
-from .common import data
+try:
+    from .common import data
+except ImportError:
+    from common import data
 from sklearn.model_selection import train_test_split
 
 tfds.disable_progress_bar()
