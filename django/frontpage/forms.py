@@ -16,3 +16,7 @@ class UploadForm(forms.Form):
             if not Path(user_file.name).suffix.strip().lower() in ['.jpg','.png','.gif','.jpeg']:
                 raise forms.ValidationError("File does not look like as picture.")
         return user_file
+
+class ExplainForm(forms.Form):
+    #TODO: http://www.ilian.io/django-forms-choicefield-with-dynamic-values/
+    pass

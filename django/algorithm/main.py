@@ -32,7 +32,7 @@ def get_imagenet_to_label():
     return imagenet_code_to_label
 
 
-def predict(test_image_path, show_img=True):
+def predict(test_image_path):
     my_model = InceptionV3()
     my_model.model.summary()
     # my_model = inc_net.InceptionV3()
@@ -43,26 +43,28 @@ def predict(test_image_path, show_img=True):
     # my_model.train(data, epochs=2)
 
     img = image.load_img(test_image_path, target_size=(299, 299))
-    ranks = image.img_to_array(img)
-    ranks = np.expand_dims(ranks, axis=0)
-    ranks = prepro_inp(ranks)
-    ranks = np.vstack([ranks])
+    x = image.img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    x = prepro_inp(x)
+    x = np.vstack([x])
 
-    prediction = my_model.predict(ranks)
+    prediction = my_model.predict(x)
 
-    for i in my_model.decode_predict(prediction):
-        print(i)
+    # for i in my_model.decode_predict(prediction):
+    #     print(i)
+    return x, my_model.decode_predict(prediction), my_model
+
+def explain(image, my_model, prediction_rank=0, show_img=True):
 
     start = time.time()
     explainer = lime_image.LimeImageExplainer(verbose=True)
-    explanation = explainer.explain_instance(ranks[0], my_model.predict, top_labels=5, hide_color=0, num_samples=1000)
+    explanation = explainer.explain_instance(image, my_model.predict, top_labels=5, hide_color=0, num_samples=1000)
     # print(explanation)
 
-    ranks = 0
     decoder = get_imagenet_to_label()
-    print(explanation.top_labels[ranks], decoder[explanation.top_labels[ranks]])
+    print(explanation.top_labels[prediction_rank], decoder[explanation.top_labels[prediction_rank]])
 
-    temp, mask = explanation.get_image_and_mask(explanation.top_labels[ranks], positive_only=False, num_features=5,
+    temp, mask = explanation.get_image_and_mask(explanation.top_labels[prediction_rank], positive_only=False, num_features=5,
                                                 hide_rest=False)  # num_features is top super pixel that gives positive value
 
     print("Explanation time", time.time() - start)
@@ -88,6 +90,8 @@ if __name__ == '__main__':
     else:
         test_image_path = args.image
     print("Using file from {}".format(test_image_path))
-    predict(test_image_path)
-
+    images, prediction, my_model = predict(test_image_path)
+    print("Decoding")
+    print(prediction)
+    explain(images[0], my_model, show_img=True)
 

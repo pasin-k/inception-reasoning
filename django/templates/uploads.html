@@ -21,6 +21,7 @@
         </div>
 
         <div class="w3-container">
+            {% if not origin_name  %}
             <form action="/upload-form/" enctype="multipart/form-data" method="post" >
                 {% csrf_token %}
                 {{ userform.as_p}}
@@ -34,6 +35,13 @@
 <!--                    <span class="image-preview_default-text">Image Preview</span>-->
 <!--                </div>-->
 <!--                <br>-->
+            </form>
+
+            {% if origin_name  %}
+            <form action="/explain-form/" enctype="multipart/form-data" method="post" >
+                {% csrf_token %}
+                {{ explain_form.as_p}}
+                <button type="submit">Test your image</button>
             </form>
 
             <br>
@@ -54,6 +62,8 @@
                 <h2>{{ thumb_name }} (150x150)</h2>
                 <img src="{{ MEDIA_URL }}{{folder_dir}}{{ thumb_name }}">
             {% endif %}
+
+
         </div>
     </div>
 </div>
