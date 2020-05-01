@@ -15,17 +15,22 @@
         <img alt="Nature" class="centered-and-cropped"
              height="150" src="https://cdn.pixabay.com/photo/2018/09/27/09/22/web-3706562__340.jpg" style="width:100%"
              width="350">
+
+        {% if origin_name is None %}
         <div class="w3-container">
             <h3><b>Upload or Choose Image</b></h3>
             <h5>Select an image to visualize. Note that it takes a while to process after the 'submit' button is pressed </h5>
         </div>
+        {% endif %}
 
         <div class="w3-container">
-            {% if not origin_name  %}
+            <h5>Debug: {{ origin_name | safe }}</h5>
+            {% if origin_name is None %}
             <form action="/upload-form/" enctype="multipart/form-data" method="post" >
                 {% csrf_token %}
                 {{ userform.as_p}}
-                <button type="submit">Test your image</button>
+                <input name="upload_image" type="submit" value="Test your image"/>
+
 <!--                <label for="fileToUpload">Select Image:</label>-->
 <!--                <input id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" type="hidden" value="8388608">-->
 <!--                <input id="fileToUpload" name="fileToUpload" type="file">-->
@@ -36,20 +41,25 @@
 <!--                </div>-->
 <!--                <br>-->
             </form>
+            {% endif %}
+        </div>
 
-            {% if origin_name  %}
+        <div class="w3-container">
+            {% if origin_name is not None %}
             <form action="/explain-form/" enctype="multipart/form-data" method="post" >
+                <h3><b>Here is the top5 prediction of the model</b></h3>
+                <h5>Select one class to see the reasoning behind it</h5>
                 {% csrf_token %}
                 {{ explain_form.as_p}}
-                <button type="submit">Test your image</button>
+                <input name="explain_image" type="submit" value="Explain!"/>
             </form>
-
+            {% endif %}
             <br>
             <br>
 
 
 
-            {% if origin_name  %}
+            {% if origin_name %}
                 <h2>{{origin_name}} (original) {{title}}</h2>
                 <img src="{{MEDIA_URL}}{{folder_dir}}{{origin_name}}">
             {% endif %}

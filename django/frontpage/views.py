@@ -4,15 +4,15 @@ from django.urls import reverse_lazy # new
 from django.conf import settings
 
 from pathlib import Path
-import os, sys
+import os, sys, json
 from PIL import Image as PILImg
 from PIL import ImageEnhance as PILImageEnhance
-from .forms import UploadForm
+from .forms import UploadForm, ExplainForm
 from .models import Upload
 
 sys.path.append('..')
 import numpy as np
-from algorithm.main import predict
+from algorithm.main import predict, explain
 
 # Create your views here.
 class HomePageView(ListView):
@@ -43,12 +43,18 @@ def upload_file(request):
             image = image.resize((299, 299), PILImg.ANTIALIAS)
             image.save(original_file, 'PNG')
 
-            _, prediction, _ = predict(original_file, show_img=False)
-            class_name = [i[1] for i in prediction[0]]  # Prediction has [id, class_name, confident]
-            # data.update(title=userform['title'].value)
+            # Get the top5 prediction & Save it as temp file
+            _, prediction, _ = predict(original_file)
+            decoded_prediction = {'class_name':[i[1] for i in prediction[0]],  # Prediction has [id, class_name, confident]
+                                    'confident':[str(i[2]) for i in prediction[0]]}  # Prediction has [id, class_name, confident]
+            prediction_path = Path(settings.MEDIA_ROOT).joinpath('json','prediction_temp.json')
+            with open(prediction_path,'w') as f:
+                json.dump(decoded_prediction,f)
+
+            # Update dictionary to display in uploads.html
             data.update(origin_name=origin_name)
             data.update(folder_dir=folder)
-            data.update(prediction=class_name)
+            data.update(prediction=decoded_prediction['class_name'])
             # data.update(thumb_name=predicted_name)
             userform = UploadForm()
     else:
@@ -62,7 +68,7 @@ def get_explanation(request):
     folder = "images/"
     data = {}
     if request.POST:
-        explain_form = UploadForm(request.POST, request.FILES)
+        explain_form = ExplainForm(request.POST, request.FILES)
         if explain_form.is_valid():
 
             origin_form = explain_form.cleaned_data["user_file"]
@@ -93,9 +99,9 @@ def get_explanation(request):
             data.update(origin_name=origin_name)
             data.update(folder_dir=folder)
             data.update(thumb_name=predicted_name)
-            explain_form = UploadForm()
+            explain_form = ExplainForm()
     else:
-        explain_form = UploadForm()
+        explain_form = ExplainForm()
 
     data.update(userform=explain_form)
     return render(request, template, data)

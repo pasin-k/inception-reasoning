@@ -1,6 +1,8 @@
 from django import forms
+from django.conf import settings
 from .models import Upload
 from pathlib import Path
+import json
 
 class UploadForm(forms.Form):
     # title = forms.CharField(max_length=50)
@@ -17,6 +19,17 @@ class UploadForm(forms.Form):
                 raise forms.ValidationError("File does not look like as picture.")
         return user_file
 
+
+def get_my_choices():
+    prediction_path = Path(settings.MEDIA_ROOT).joinpath('json', 'prediction_temp.json')
+    with open(prediction_path) as f:
+        data = json.load(f)
+        class_name = data['class_name']
+    return class_name
+
+
 class ExplainForm(forms.Form):
     #TODO: http://www.ilian.io/django-forms-choicefield-with-dynamic-values/
-    pass
+    def __init__(self, *args, **kwargs):
+        super(ExplainForm, self).__init__(*args, **kwargs)
+        self.fields['my_choice_field'] = forms.ChoiceField(choices=get_my_choices())
