@@ -25,11 +25,12 @@ def get_my_choices():
     with open(prediction_path) as f:
         data = json.load(f)
         class_name = data['class_name']
+        confident = data['confident']
+    class_name = [(i, "{}, Confident: {}%".format(n,float(c)*100)) for i,(n,c) in enumerate(zip(class_name, confident))]
     return class_name
 
 
 class ExplainForm(forms.Form):
-    #TODO: http://www.ilian.io/django-forms-choicefield-with-dynamic-values/
     def __init__(self, *args, **kwargs):
         super(ExplainForm, self).__init__(*args, **kwargs)
         self.fields['my_choice_field'] = forms.ChoiceField(choices=get_my_choices())
