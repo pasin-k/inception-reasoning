@@ -4,18 +4,19 @@ from .models import Upload
 from pathlib import Path
 import json
 
+
 class UploadForm(forms.Form):
     # title = forms.CharField(max_length=50)
     user_file = forms.FileField()
 
     def clean_user_file(self, *args, **kwargs):
-        cleaned_data = super(UploadForm,self).clean()
+        cleaned_data = super(UploadForm, self).clean()
         user_file = cleaned_data.get("user_file")
 
         if user_file:
-            if user_file.size > 5*1024*1024:
+            if user_file.size > 5 * 1024 * 1024:
                 raise forms.ValidationError("File is too big")
-            if not Path(user_file.name).suffix.strip().lower() in ['.jpg','.png','.gif','.jpeg']:
+            if not Path(user_file.name).suffix.strip().lower() in ['.jpg', '.png', '.gif', '.jpeg']:
                 raise forms.ValidationError("File does not look like as picture.")
         return user_file
 
@@ -26,7 +27,8 @@ def get_my_choices():
         data = json.load(f)
         class_name = data['class_name']
         confident = data['confident']
-    class_name = [(i, "{}, Confident: {}%".format(n,float(c)*100)) for i,(n,c) in enumerate(zip(class_name, confident))]
+    class_name = [(i, "{}, Confident: {}%".format(n, float(c) * 100)) for i, (n, c) in
+                  enumerate(zip(class_name, confident))]
     return class_name
 
 

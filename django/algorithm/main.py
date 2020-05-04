@@ -11,10 +11,13 @@ from skimage.segmentation import mark_boundaries
 from lime import lime_image
 from tensorflow.keras.applications.inception_v3 import preprocess_input as prepro_inp
 from tensorflow.keras.preprocessing import image
+
 try:
     from .model import InceptionV3  # Use for django run
 except ImportError:
     from model import InceptionV3  # Use for terminal run
+
+
 # from .common.data import Dataset
 
 def get_imagenet_to_label():
@@ -54,8 +57,8 @@ def predict(test_image_path):
     #     print(i)
     return x, my_model.decode_predict(prediction), my_model
 
-def explain(image, my_model, prediction_rank=0, show_img=True):
 
+def explain(image, my_model, prediction_rank=0, show_img=True):
     start = time.time()
     explainer = lime_image.LimeImageExplainer(verbose=True)
     explanation = explainer.explain_instance(image, my_model.predict, top_labels=5, hide_color=0, num_samples=1000)
@@ -64,7 +67,8 @@ def explain(image, my_model, prediction_rank=0, show_img=True):
     decoder = get_imagenet_to_label()
     print(explanation.top_labels[prediction_rank], decoder[explanation.top_labels[prediction_rank]])
 
-    temp, mask = explanation.get_image_and_mask(explanation.top_labels[prediction_rank], positive_only=False, num_features=5,
+    temp, mask = explanation.get_image_and_mask(explanation.top_labels[prediction_rank], positive_only=False,
+                                                num_features=5,
                                                 hide_rest=False)  # num_features is top super pixel that gives positive value
 
     print("Explanation time", time.time() - start)
@@ -94,4 +98,3 @@ if __name__ == '__main__':
     print("Decoding")
     print(prediction)
     explain(images[0], my_model, show_img=True)
-

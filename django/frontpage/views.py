@@ -84,11 +84,11 @@ def upload_file(request):
                 print(prediction_array)
                 print(prediction_array.dtype)
                 predict_image = PILImg.fromarray(prediction_array)
-                predict_image.save(prediction_file,'PNG')
+                predict_image.save(prediction_file, 'PNG')
 
                 userform = UploadForm()
                 data.update(class_name=class_name[choice])
-                data.update(confident=float(confident[choice])*100)
+                data.update(confident=float(confident[choice]) * 100)
                 data.update(origin_name=original_file)
                 data.update(predict_name=predicted_name)
                 data.update(folder_dir=folder)
