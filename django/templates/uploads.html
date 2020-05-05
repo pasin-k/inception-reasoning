@@ -5,8 +5,9 @@
     <!-- Header -->
     <header class="w3-container w3-center w3-padding-32 >
         <h1><b>InceptionV3 Explanator</b></h1>
-        <p>Try your image by uploading an image and click "uploads".
-        </p>
+        <p>Try your image by uploading an image and click " uploads
+    ".
+    </p>
     </header>
 
     <!-- Main Body-->
@@ -16,63 +17,82 @@
              height="150" src="https://cdn.pixabay.com/photo/2018/09/27/09/22/web-3706562__340.jpg" style="width:100%"
              width="350">
 
-<!--        Display prediction image section-->
+        <!--        Display prediction image section-->
         {% if predict_name is not None %}
         <div class="w3-container">
-            <h2>Original Image</h2>
-            <img src="{{MEDIA_URL}}{{folder_dir}}{{origin_name}}">
-
-            <br><h2>Explaination as {{class_name}} ({{confident}}%)</h2>
-            <img src="{{ MEDIA_URL }}{{folder_dir}}{{predict_name}}">
-
-            <h2><b>Try new image!</b></h2>
+            <div class="w3-row">
+<!--                <div class="w3-col m8 s12">-->
+                    <div class="row">
+                        <h2><b>Result</b></h2>
+                        <div class="column">
+                            <h2>Original Image</h2>
+                            <img src="{{MEDIA_URL}}{{folder_dir}}{{origin_name}}">
+                        </div>
+                        <br>
+                        <div class="column">
+                            <h2>Explaination: {{class_name}} ({{confident}}%)</h2>
+                            <img src="{{ MEDIA_URL }}{{folder_dir}}{{predict_name}}">
+                        </div>
+                    </div>
+                    <h2><b>Try new image!</b></h2>
+<!--                </div>-->
+            </div>
         </div>
         {% endif %}
 
-<!--        Upload image to test section-->
+        <!--        Upload image to test section-->
         {% if userform is not None %}
         <div class="w3-container">
-            <h3><b>Upload or Choose Image</b></h3>
-            <h5>Select an image to visualize.</h5>
-            <h5><b>Note: </b> This takes a while to process after clicking 'submit'</h5>
-        </div>
+            <div class="w3-row">
+<!--                <div class="w3-col m8 s12">-->
+                    <h3><b>Upload or Choose Image</b></h3>
+                    <h5>Select an image to visualize.</h5>
+<!--                </div>-->
+            </div>
+            <div class="w3-container">
+                <form action="/upload-form/" enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
+                    {{ userform.as_p}}
+                    <input name="upload_image" type="submit" value="Test your image"/>
+                    <h5><b>Note: </b> This takes a while to process after clicking 'submit'</h5>
+                    <!--                <label for="fileToUpload">Select Image:</label>-->
+                    <!--                <input id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" type="hidden" value="8388608">-->
+                    <!--                <input id="fileToUpload" name="fileToUpload" type="file">-->
+                    <!--                Image Previewer-->
+                    <!--                <div class="image-preview" id="imagePreview">-->
+                    <!--                    <img alt="Image Preview" class="image-preview__image" src="">-->
+                    <!--                    <span class="image-preview_default-text">Image Preview</span>-->
+                    <!--                </div>-->
+                    <!--                <br>-->
+                </form>
+                {% endif %}
+            </div>
 
-        <div class="w3-container">
-            <form action="/upload-form/" enctype="multipart/form-data" method="post">
-                {% csrf_token %}
-                {{ userform.as_p}}
-                <input name="upload_image" type="submit" value="Test your image"/>
-                <!--                <label for="fileToUpload">Select Image:</label>-->
-                <!--                <input id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" type="hidden" value="8388608">-->
-                <!--                <input id="fileToUpload" name="fileToUpload" type="file">-->
-                <!--                Image Previewer-->
-                <!--                <div class="image-preview" id="imagePreview">-->
-                <!--                    <img alt="Image Preview" class="image-preview__image" src="">-->
-                <!--                    <span class="image-preview_default-text">Image Preview</span>-->
-                <!--                </div>-->
-                <!--                <br>-->
-            </form>
+            {% if explainform is not None %}
+            <div class="w3-container">
+                <div class="w3-row">
+<!--                    <div class="w3-col m8 s12">-->
+                        <h3><b>Select class to see explanation</b></h3>
+                        <h5><b>Original Image (Resized)</b></h5>
+                        <br>
+                        <img src="{{MEDIA_URL}}{{folder_dir}}{{origin_name}}">
+                        <h5>Select one class to see the reasoning behind it</h5>
+<!--                    </div>-->
+                </div>
+            </div>
+
+            <div class="w3-container">
+                <form action="/upload-form/" enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
+                    {{ explainform.as_p}}
+                    <input name="explain_image" type="submit" value="Explain!"/>
+                    <h5><b>Note: </b> This takes a while to process after clicking 'Explain!'</h5>
+                </form>
+
+            </div>
             {% endif %}
         </div>
 
-        {% if explainform is not None %}
-        <div class="w3-container">
-            <h3><b>Select class to see explanation</b></h3>
-            <h5>Here is the top5 prediction of the model</h5>
-            <h5>Select one class to see the reasoning behind it</h5>
-            <h5><b>Note: </b> This takes a while to process after clicking 'Explain!'</h5>
-        </div>
-
-        <div class="w3-container">
-            <form action="/upload-form/" enctype="multipart/form-data" method="post">
-                {% csrf_token %}
-                {{ explainform.as_p}}
-                <input name="explain_image" type="submit" value="Explain!"/>
-            </form>
-        </div>
-        {% endif %}
+        <br>
     </div>
-
-    <br>
-</div>
-{% endblock %}
+    {% endblock %}

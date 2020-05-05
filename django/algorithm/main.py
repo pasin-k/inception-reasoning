@@ -34,6 +34,16 @@ def get_imagenet_to_label():
         imagenet_code_to_label[int(temp[0])] = temp[1].replace('\'', '').strip()
     return imagenet_code_to_label
 
+def get_model(test_image_path):
+    my_model = InceptionV3()
+    img = image.load_img(test_image_path, target_size=(299, 299))
+    x = image.img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    x = prepro_inp(x)
+    x = np.vstack([x])
+
+    return x[0], my_model
+
 
 def predict(test_image_path):
     my_model = InceptionV3()

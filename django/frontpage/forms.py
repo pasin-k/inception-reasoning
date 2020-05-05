@@ -35,4 +35,4 @@ def get_my_choices():
 class ExplainForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ExplainForm, self).__init__(*args, **kwargs)
-        self.fields['my_choice_field'] = forms.ChoiceField(choices=get_my_choices())
+        self.fields['Top_5_prediction'] = forms.ChoiceField(choices=get_my_choices())
